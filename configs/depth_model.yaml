@@ -1,1 +1,10 @@
-# 타겟 Depth 모델 파라미터
+model_name: depth_anything_v2_vits
+encoder: vits
+input_size: 518
+checkpoint: models/pytorch/depth_anything_v2_vits.pth
+onnx_path: models/onnx/depth_anything_v2_vits_518.onnx
+dlc_path: models/dlc/depth_anything_v2_vits_518.dlc
+raw_input_dir: data/inputs_raw_fmt
+output_dir: data/outputs
+backend: htp
+quantize: true
