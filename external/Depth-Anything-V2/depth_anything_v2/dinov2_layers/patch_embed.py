@@ -67,14 +67,12 @@ class PatchEmbed(nn.Module):
         self.norm = norm_layer(embed_dim) if norm_layer else nn.Identity()
 
     def forward(self, x: Tensor) -> Tensor:
-        # x: (B, 3, 518, 518)
-        x = self.proj(x)                  # (B, Embed_Dim, 37, 37)
+        x = self.proj(x)                  # (1, 384, 37, 37)
 
-        # Conv 바로 뒤 Reshape를 피하기 위해
-        # 먼저 channel-last로 바꾼 뒤 flatten
-        x = x.permute(0, 2, 3, 1).contiguous()   # (B, 37, 37, Embed_Dim)
-        x = x.view(x.shape[0], 37 * 37, x.shape[-1])  # (B, 1369, Embed_Dim)
-
+        # 4D를 유지하다가 Transformer 들어가기 직전에 한 번에 포맷 변경 (B, L, C)
+        x = x.permute(0, 2, 3, 1)         # (1, 37, 37, 384)
+        x = x.reshape(1, 1369, 384)       # (1, 1369, 384)
+        
         x = self.norm(x)
         return x
 
