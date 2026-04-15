@@ -13,7 +13,7 @@ export:
   output_names: ["output"]
   opset_version: 13
   dynamo: false
-  output_path: models/onnx/depth_anything_v2_vits_518.onnx
+  output_path: models/onnx/depth_anything_v2_vits_518_sim.onnx
 
 validation:
   rtol: 1e-3
