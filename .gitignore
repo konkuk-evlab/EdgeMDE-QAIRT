@@ -36,3 +36,19 @@ Thumbs.db
 /data/raw/
 /data/inputs_raw_fmt/
 /data/outputs/
+
+/external/checkpoints/
+
+# Depth-Anything-V2: Only keep the core model package
+/external/Depth-Anything-V2/*
+!/external/Depth-Anything-V2/depth_anything_v2/
+/external/Depth-Anything-V2/depth_anything_v2/**/__pycache__/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/

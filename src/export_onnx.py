@@ -12,12 +12,14 @@ import torch
 import yaml
 
 from src.models import SimpleCNN
+from src.models.depth_anything_v2_vits import DepthAnythingV2Wrapper
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_CONFIG_PATH = PROJECT_ROOT / "configs" / "simple_cnn.yaml"
+DEFAULT_CONFIG_PATH = PROJECT_ROOT / "configs" / "depth_model.yaml"
 
 MODEL_REGISTRY = {
     "simple_cnn": SimpleCNN,
+    "depth_anything_v2_vits": DepthAnythingV2Wrapper,
 }
 
 
@@ -87,6 +89,7 @@ def export_model(
         "input_names": export_config["input_names"],
         "output_names": export_config["output_names"],
         "opset_version": export_config["opset_version"],
+        "dynamic_axes": None,
     }
     if "dynamo" in inspect.signature(torch.onnx.export).parameters:
         export_kwargs["dynamo"] = export_config.get("dynamo", False)
@@ -122,11 +125,18 @@ def validate_export(
         {input_name: dummy_input.detach().cpu().numpy()},
     )[0]
 
+    # rtol, atol 값을 float으로 강제 변환 (YAML 파서의 타입 이슈 방지)
+    rtol = float(validation_config["rtol"])
+    atol = float(validation_config["atol"])
+
+    # 모델 출력이 multiple outputs(list/tuple)인 경우 첫 번째 출력만 비교
+    actual_torch_output = torch_output[0] if isinstance(torch_output, (list, tuple)) else torch_output
+
     np.testing.assert_allclose(
-        torch_output.detach().cpu().numpy(),
+        actual_torch_output.detach().cpu().numpy(),
         ort_output,
-        rtol=validation_config["rtol"],
-        atol=validation_config["atol"],
+        rtol=rtol,
+        atol=atol,
     )
 
 
