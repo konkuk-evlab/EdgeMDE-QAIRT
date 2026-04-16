@@ -13,6 +13,8 @@ RUN apt-get update && apt-get install -y \
     nano \
     vim \
     libatomic1 \
+    libgl1 \
+    libglib2.0-0 \
     libc++1 \
     libc++abi1 \
     && rm -rf /var/lib/apt/lists/*

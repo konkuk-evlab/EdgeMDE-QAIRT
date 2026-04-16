@@ -5,6 +5,7 @@ onnxsim
 onnxscript
 torch
 torchvision
+opencv-python
 pyyaml
 decorator
 psutil
