@@ -67,13 +67,18 @@ class PatchEmbed(nn.Module):
         self.norm = norm_layer(embed_dim) if norm_layer else nn.Identity()
 
     def forward(self, x: Tensor) -> Tensor:
-        x = self.proj(x)                  # (1, 384, 37, 37)
+        _, _, H, W = x.shape
+        patch_H, patch_W = self.patch_size
 
-        # 4D를 유지하다가 Transformer 들어가기 직전에 한 번에 포맷 변경 (B, L, C)
-        x = x.permute(0, 2, 3, 1)         # (1, 37, 37, 384)
-        x = x.reshape(1, 1369, 384)       # (1, 1369, 384)
-        
+        assert H % patch_H == 0, f"Input image height {H} is not a multiple of patch height {patch_H}"
+        assert W % patch_W == 0, f"Input image width {W} is not a multiple of patch width: {patch_W}"
+
+        x = self.proj(x)  # B C H W
+        H, W = x.size(2), x.size(3)
+        x = x.flatten(2).transpose(1, 2)  # B HW C
         x = self.norm(x)
+        if not self.flatten_embedding:
+            x = x.reshape(-1, H, W, self.embed_dim)  # B H W C
         return x
 
     def flops(self) -> float:
